@@ -1,0 +1,27 @@
+# Build output directories
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Logs
+*.log
+
+# IDE directories
+.vscode/
+.vs/
+.idea/
+
+# Package directories
+node_modules/
+
+# Publish directory
+publish/
+
+# Environment-specific files
+.DS_Store
+Thumbs.db
+
+.fake
