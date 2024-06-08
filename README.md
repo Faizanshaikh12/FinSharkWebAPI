@@ -30,3 +30,34 @@ Stock Market / Social Media Platform .NET Core Web API
    dotnet run
    dotnet watch run
    ```
+
+## Entity Framework Core Migrations
+
+### Adding a Migration
+```sh
+dotnet ef migrations add <MigrationName>
+dotnet ef migrations add InitialCreate
+```
+
+### Updating the Database
+```sh
+dotnet ef database update
+dotnet ef database update <PreviousMigration>
+```
+
+### Removing the Last Migration
+```sh
+dotnet ef migrations remove
+```
+
+### Listing Migrations
+```sh
+dotnet ef migrations list
+```
+
+### Generating SQL Script for Migrations
+```sh
+dotnet ef migrations script
+dotnet ef migrations script <FromMigration> <ToMigration>
+dotnet ef migrations script InitialCreate AddNewTable
+```
