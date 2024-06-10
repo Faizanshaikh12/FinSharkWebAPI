@@ -1,5 +1,7 @@
 using FinSharkWebAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using FinSharkWebAPI.Interfaces;
+using FinSharkWebAPI.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddSwaggerGen();
 // Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 var app = builder.Build();
 
