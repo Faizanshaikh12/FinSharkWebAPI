@@ -9,7 +9,6 @@ using FinSharkWebAPI.Dtos.Stock;
 using FinSharkWebAPI.Dtos.Comment;
 using FinSharkWebAPI.Mappers;
 using FinSharkWebAPI.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace FinSharkWebAPI.Controllers
 {
@@ -20,28 +19,31 @@ namespace FinSharkWebAPI.Controllers
         public readonly AppDbContext _context;
         public readonly ICommentRepository _commentRepo;
         public readonly IStockRepository _stockRepo;
-        private readonly ILogger<CommentController> _logger;
 
-        public CommentController(AppDbContext context, ICommentRepository commentRepo, IStockRepository stockRepo, ILogger<CommentController> logger)
+        public CommentController(AppDbContext context, ICommentRepository commentRepo, IStockRepository stockRepo)
         {
             _commentRepo = commentRepo;
             _stockRepo = stockRepo;
             _context = context;
-            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             var comment = await _commentRepo.GetAllAsync();
             var commentDto = comment.Select(s => s.ToCommentDto());
             return Ok(commentDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comment = await _commentRepo.GetByIdAsync(id);
             if (comment == null)
             {
@@ -51,12 +53,11 @@ namespace FinSharkWebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("{stockId}")]
+        [Route("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, [FromBody] CreateCommentDto commentDto)
         {
-         // Log the content of commentDto
-            _logger.LogInformation("Received Stock ID", stockId);
-            _logger.LogInformation("Received commentDto: {@CommentDto}", commentDto);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
              if (!await _stockRepo.StockExists(stockId))
             {
@@ -68,9 +69,12 @@ namespace FinSharkWebAPI.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto updateDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdateDto());
             if (comment == null)
             {
@@ -81,9 +85,12 @@ namespace FinSharkWebAPI.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var comment = await _commentRepo.DeleteAsync(id);
             if (comment == null)
             {
