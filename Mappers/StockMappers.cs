@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FinSharkWebAPI.Dtos.Stock;
+using FinSharkWebAPI.Dtos.Comment;
 using FinSharkWebAPI.Models;
 
 namespace FinSharkWebAPI.Mappers
@@ -20,6 +21,7 @@ namespace FinSharkWebAPI.Mappers
                 LasDiv = stockModel.LasDiv,
                 Industry = stockModel.Industry,
                 MarketCap = stockModel.MarketCap,
+                Comments = stockModel.Comments.Select(c => c.ToCommentDto()).ToList(),
             };
         }
 

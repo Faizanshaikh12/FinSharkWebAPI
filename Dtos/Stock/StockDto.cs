@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FinSharkWebAPI.Dtos.Comment;
 
 namespace FinSharkWebAPI.Dtos.Stock
 {
@@ -14,5 +15,6 @@ namespace FinSharkWebAPI.Dtos.Stock
         public decimal LasDiv { get; set; }
         public string Industry { get; set; } = string.Empty;
         public long MarketCap { get; set; }
+        public List<CommentDto> Comments { get; set; }
     }
 }
