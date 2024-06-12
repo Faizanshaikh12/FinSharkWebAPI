@@ -30,5 +30,14 @@ namespace FinSharkWebAPI.Mappers
                 StockId = stockId
             };
         }
+
+        public static Comment ToCommentFromUpdateDto(this UpdateCommentDto commentModel)
+        {
+            return new Comment
+            {
+                Title = commentModel.Title,
+                Content = commentModel.Content
+            };
+        }
     }
 }

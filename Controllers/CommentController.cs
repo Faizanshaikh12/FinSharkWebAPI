@@ -67,30 +67,30 @@ namespace FinSharkWebAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());
         }
 
-        // [HttpPut]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
-        // {
-        //     var stockModel = await _stockRepo.UpdateAsync(id, updateDto);
-        //     if (stockModel == null)
-        //     {
-        //         return NotFound();
-        //     }
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto updateDto)
+        {
+            var comment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdateDto());
+            if (comment == null)
+            {
+                return NotFound("Comment not found");
+            }
 
-        //     return Ok(stockModel.ToStockDto());
-        // }
+            return Ok(comment.ToCommentDto());
+        }
 
-        // [HttpDelete]
-        // [Route("{id}")]
-        // public async Task<IActionResult> Delete([FromRoute] int id)
-        // {
-        //     var stockModel = await _stockRepo.DeleteAsync(id);
-        //     if (stockModel == null)
-        //     {
-        //         return NotFound();
-        //     }
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var comment = await _commentRepo.DeleteAsync(id);
+            if (comment == null)
+            {
+                return NotFound("Comment not found");
+            }
 
-        //     return NoContent();
-        // }
+            return NoContent();
+        }
     }
 }
