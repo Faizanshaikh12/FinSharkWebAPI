@@ -7,6 +7,7 @@ using FinSharkWebAPI.Data;
 using FinSharkWebAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using FinSharkWebAPI.Dtos.Stock;
+using FinSharkWebAPI.Helpers;
 
 namespace FinSharkWebAPI.Repository
 {
@@ -19,9 +20,36 @@ namespace FinSharkWebAPI.Repository
             _context = context;
         }
         
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject qeury)
         {
-            return await _context.Stocks.Include(c => c.Comments).ToListAsync();
+            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(qeury.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(qeury.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(qeury.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(qeury.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(qeury.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(qeury.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(qeury.SortBy))
+            {
+                if(qeury.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = qeury.IsDecsending ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+                }
+            }
+
+            var skipNumber = (qeury.Page - 1) * qeury.PageSize;
+
+            return await stocks.Skip(skipNumber).Take(qeury.PageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
