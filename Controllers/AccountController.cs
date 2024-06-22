@@ -1,62 +1,61 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using FinSharkWebAPI.Models;
 using FinSharkWebAPI.Dtos.Account;
+using FinSharkWebAPI.Interfaces;
+using FinSharkWebAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace FinSharkWebAPI.Controllers
+namespace FinSharkWebAPI.Controllers;
+
+[Route("api/account")]
+[ApiController]
+public class AccountController : ControllerBase
 {
-    [Route("api/account")]
-    [ApiController]
-    public class AccountController: ControllerBase
+    private readonly UserManager<AppUser> _userManager;
+    private readonly ITokenService _tokenService;
+    public AccountController(UserManager<AppUser> userManager, ITokenService tokenService)
     {
-        private readonly UserManager<AppUser> _userManager;
+        _userManager = userManager;
+        _tokenService = tokenService;
+    }
 
-        public AccountController(UserManager<AppUser> userManager)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+    {
+        try
         {
-            _userManager = userManager;
-        }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
-        {
-            try
+            var appUser = new AppUser
             {
-                if(!ModelState.IsValid)
-                    return BadRequest(ModelState);
+                UserName = registerDto.Username,
+                Email = registerDto.Email
+            };
 
-                var appUser = new AppUser
+            var createUser = await _userManager.CreateAsync(appUser, registerDto.Password);
+
+            if (createUser.Succeeded)
+            {
+                var roleResult = await _userManager.AddToRoleAsync(appUser, "User");
+                if (roleResult.Succeeded)
                 {
-                    UserName = registerDto.Username,
-                    Email = registerDto.Email,
-                };
-
-                var createUser = await _userManager.CreateAsync(appUser, registerDto.Password);
-
-                if(createUser.Succeeded)
-                {
-                    var roleResult = await  _userManager.AddToRoleAsync(appUser, "User");
-                    if(roleResult.Succeeded)
-                    {
-                        return Ok("User Created");
-                    }
-                    else
-                    {
-                        return StatusCode(500, roleResult.Errors);
-                    }
-                }else{
-                        return StatusCode(500, createUser.Errors);
-                }
+                    return Ok(
+                        new NewUserDto
+                        {
+                            UserName = appUser.UserName,
+                            Email = appUser.Email,
+                            Token = _tokenService.CreateToken(appUser)
+                        }
+                        );
+                };  
+                return StatusCode(500, roleResult.Errors);
             }
-            catch (Exception e)
-            {   
-                    return StatusCode(500, e);
-            }
+
+            return StatusCode(500, createUser.Errors);
         }
-        
+        catch (Exception e)
+        {
+            return StatusCode(500, e);
+        }
     }
 }
