@@ -3,6 +3,7 @@ using FinSharkWebAPI.Dtos.Stock;
 using FinSharkWebAPI.Helpers;
 using FinSharkWebAPI.Interfaces;
 using FinSharkWebAPI.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinSharkWebAPI.Controllers;
@@ -21,6 +22,7 @@ public class StockController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
     {
         if (!ModelState.IsValid)
